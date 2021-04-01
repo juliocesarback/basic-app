@@ -1,0 +1,12 @@
+secretGenerator:
+- name: mysql-pass
+  namespace: application
+  literals:
+  - password=ABCDE12345
+resources:
+  - 0-ns.yaml
+  - 1-configmap.yaml
+  - 2-svc.yaml
+  - 3-statefulset.yaml
+  - 4-wordpress-deployment.yaml
+  - 5-auto-scaling.yaml
