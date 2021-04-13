@@ -1,16 +1,4 @@
-variable "project_id" {
-  description = "The project ID to host the cluster in"
-}
-
-variable "cluster_name" {
-  description = "The name for the GKE cluster"
-  default     = "example-cluster-app"
-}
-
-variable "env_name" {
-  description = "The environment for the GKE cluster"
-  default     = "prod"
-}
+variable "project_id" {}
 
 variable "region" {
   description = "The region to host the cluster in"
@@ -35,4 +23,26 @@ variable "ip_range_pods_name" {
 variable "ip_range_services_name" {
   description = "The secondary ip range to use for services"
   default     = "ip-range-services"
+}
+
+variable "project_name" {
+  description = "The name of project"
+  default     = "wordpress"
+}
+
+variable "instance_size" {
+  type = map(string)
+}
+
+##################################################################################
+# LOCALS
+##################################################################################
+
+locals {
+  env_name = lower(terraform.workspace)
+
+  common_tags = {
+    Environment = local.env_name
+  }
+
 }

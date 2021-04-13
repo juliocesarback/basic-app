@@ -10,22 +10,22 @@ module "gke_auth" {
 }
 resource "local_file" "kubeconfig" {
   content  = module.gke_auth.kubeconfig_raw
-  filename = "kubeconfig-${var.env_name}"
+  filename = "kubeconfig-${local.env_name}"
 }
 module "gcp-network" {
   source       = "terraform-google-modules/network/google"
   version      = "~> 2.5"
   project_id   = var.project_id
-  network_name = "${var.network}-${var.env_name}"
+  network_name = "${local.env_name}-${var.project_name}-network"
   subnets = [
     {
-      subnet_name   = "${var.subnetwork}-${var.env_name}"
+      subnet_name   = "${local.env_name}-${var.project_name}-subnet"
       subnet_ip     = "10.10.0.0/16"
       subnet_region = var.region
     },
   ]
   secondary_ranges = {
-    "${var.subnetwork}-${var.env_name}" = [
+    "${local.env_name}-${var.project_name}-subnet" = [
       {
         range_name    = var.ip_range_pods_name
         ip_cidr_range = "10.20.0.0/16"
@@ -41,7 +41,7 @@ module "gcp-network" {
 module "gke" {
   source                 = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
   project_id             = var.project_id
-  name                   = "${var.cluster_name}-${var.env_name}"
+  name                   = "${local.env_name}-${var.project_name}-gke"
   regional               = true
   region                 = var.region
   network                = module.gcp-network.network_name
@@ -51,7 +51,7 @@ module "gke" {
   node_pools = [
     {
       name                      = "node-pool"
-      machine_type              = "e2-medium"
+      machine_type              = var.instance_size[terraform.workspace]
       node_locations            = "europe-west1-b,europe-west1-c,europe-west1-d"
       min_count                 = 1
       max_count                 = 2
